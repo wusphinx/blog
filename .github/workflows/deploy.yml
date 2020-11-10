@@ -9,7 +9,7 @@ env:
   GIT_USER: wusphinx
   GIT_EMAIL: wu.sphinx@gmail.com
   THEME_REPO: theme-next/hexo-theme-next
-  THEME_BRANCH: main
+  THEME_BRANCH: v7.8.0
   DEPLOY_REPO: wusphinx/wusphinx.github.io
   DEPLOY_BRANCH: main
 
