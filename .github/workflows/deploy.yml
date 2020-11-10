@@ -58,11 +58,8 @@ jobs:
           git config --global user.email $GIT_EMAIL
           cp _config.yml themes/next/_config.yml
 
-      - name: Install dependencies
-        run: |
-          npm i -g hexo-cli
-          npm install hexo-deployer-git --save
-
       - name: Deploy hexo
         run: |
+          npm i -g hexo-cli
+          npm i 
           hexo generate && hexo deploy 
