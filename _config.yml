@@ -106,4 +106,3 @@ deploy:
   type: git
   repo: git@github.com:wusphinx/wusphinx.github.io.git 
   branch: main
-
