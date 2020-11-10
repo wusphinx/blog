@@ -56,10 +56,10 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           git config --global user.name $GIT_USER
           git config --global user.email $GIT_EMAIL
-          cp _config.yml themes/next/_config.yml
 
       - name: Deploy hexo
         run: |
           npm i -g hexo-cli
           npm i 
+          cp _config.yml themes/next/_config.yml
           hexo generate && hexo deploy 
