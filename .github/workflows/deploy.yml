@@ -62,4 +62,4 @@ jobs:
           npm i -g hexo-cli
           npm i 
           cp _config.yml themes/next/_config.yml
-          hexo generate && hexo deploy 
+          hexo clean && hexo generate && hexo deploy 
