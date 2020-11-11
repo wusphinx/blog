@@ -689,11 +689,11 @@ cnzz_siteid:
 # AppID and AppKey are recommended to be the same as valine's for counter compatibility.
 # Do not enable both `valine.visitor` and `leancloud_visitors`.
 leancloud_visitors:
-  enable: false
-  app_id: # <your app id>
-  app_key: # <your app key>
+  enable: true
+  app_id: uc2D6XEyHmm91AIetiqdcCWm-9Nh9j0Va # <your app id>
+  app_key: HqBfxttp3OG10VMeG4Nv0dfq # <your app key>
   # Required for apps from CN region
-  server_url: # <your server url>
+  server_url: https://uc2d6xey.lc-cn-e1-shared.com # <your server url>
   # Dependencies: https://github.com/theme-next/hexo-leancloud-counter-security
   # If you don't care about security in leancloud counter and just want to use it directly
   # (without hexo-leancloud-counter-security plugin), set `security` to `false`.
@@ -703,7 +703,7 @@ leancloud_visitors:
 # Visit https://console.firebase.google.com/u/0/ to get apiKey and projectId.
 # Visit https://firebase.google.com/docs/firestore/ to get more information about firestore.
 firestore:
-  enable: true
+  enable: false
   collection: articles # Required, a string collection name to access firestore database
   apiKey: "827478506083" # Required
   projectId: blog-73cb1 # Required
