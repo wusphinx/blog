@@ -11,4 +11,4 @@ coverage/
 .deploy_git/
 themes/
 public/
-db.json
+db*.json

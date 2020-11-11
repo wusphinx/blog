@@ -197,7 +197,7 @@ deployment为k8s部署的资源描述，dev为开发环境，prod为生产环境
 
 应用的描述如下所示
 
-```plain
+```yaml
 ...
 spec:
   destination:
