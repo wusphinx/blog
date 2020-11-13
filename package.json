@@ -24,5 +24,9 @@
     "hexo-renderer-stylus": "^2.0.0",
     "hexo-server": "^2.0.0",
     "hexo-symbols-count-time": "^0.7.1"
+  },
+  "devDependencies": {
+    "hexo-generator-baidu-sitemap": "^0.1.9",
+    "hexo-generator-sitemap": "^2.1.0"
   }
 }
