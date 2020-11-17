@@ -1,7 +1,10 @@
 ---
 title: 后浪-GitOps
 date: 2020-11-05 10:32:40
+categories: 
+- DevOps
 tags:
+- DevOps
 ---
 
 
