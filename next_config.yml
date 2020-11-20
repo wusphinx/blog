@@ -65,7 +65,6 @@ footer:
 
   # If not defined, `author` from Hexo `_config.yml` will be used.
   copyright:
-    enable: true
 
   # Powered by Hexo & NexT
   powered: true
