@@ -1,65 +1,34 @@
-name: GitHub Actions Build and Deploy
+name: github pages
 
 on:
   push:
     branches:
-      - main
-
-env:
-  GIT_USER: wusphinx
-  GIT_EMAIL: wu.sphinx@gmail.com
-  THEME_REPO: theme-next/hexo-theme-next
-  THEME_BRANCH: master
-  DEPLOY_REPO: wusphinx/wusphinx.github.io
-  DEPLOY_BRANCH: main
+      - main  # Set a branch to deploy
+  pull_request:
 
 jobs:
-  build:
-    name: Build on node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node_version: [13.x]
-
+  deploy:
+    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Checkout theme repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
-          repository: ${{ env.THEME_REPO }}
-          ref: ${{ env.THEME_BRANCH }}
-          path: themes/next
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
 
-      - name: Checkout deploy repo
-        uses: actions/checkout@v2
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2.4.13
         with:
-          repository: ${{ env.DEPLOY_REPO }}
-          ref: ${{ env.DEPLOY_BRANCH }}
-          path: .deploy_git
+          hugo-version: '0.85.0'
+          # extended: true
 
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v1
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
         with:
-          node-version: ${{ matrix.node_version }}
-
-      - name: Configuration environment
-        env:
-          HEXO_DEPLOY_PRI: ${{secrets.HEXO_DEPLOY_PRI}}
-        run: |
-          sudo timedatectl set-timezone "Asia/Shanghai"
-          mkdir -p ~/.ssh/
-          echo "$HEXO_DEPLOY_PRI" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          git config --global user.name $GIT_USER
-          git config --global user.email $GIT_EMAIL
-
-      - name: Deploy hexo
-        run: |
-          npm i -g hexo-cli
-          npm i 
-          cp next_config.yml themes/next/_config.yml
-          hexo clean && hexo generate && hexo deploy 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
