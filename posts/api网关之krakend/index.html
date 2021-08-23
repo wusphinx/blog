@@ -1,0 +1,110 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>API网关之krakend | just for fun!</title><meta name=viewport content="width=device-width,minimum-scale=1"><meta name=description content="这一篇已经拖了好久了，以至于提笔开始写的时候，krakend项目已经改名为lura了，而且这个网关项目还进入到了CNCF中，真的是士别三日，当刮目相看了。不知不觉，我使用的这个开源项目作为团队的业务网关都已经上线了。
+当初我为什么要选择这个网关呢？首先团队跟外部沟通的协议为HTTP，有一些鉴权需求，本身业务量并不大，需要支持自定义插件的，最好是用golang写的，便于维护。从功能上来讲，其实nginx非常符合我的需求，除了技术栈，我只用了几天时间调研试用，就迅速确定了krakend作为API网关的框架，使用简单，性能还很强的样子。当然，从业务量上来讲，性能不是第一优先级，我需要解决的是从无到有的问题。
+我所在的团队属于初创，后端这部分有好几个人在写，功能上重复，每个人都跟自己的业务前端对接，部门所做的几个功能都挺分散的，再加上权限控制的需求愈发强烈，网关的必要性就凸显出来了。短短不到百行代码，就能创建一个API网关，这是我选择的主要原因。
+package main import ( &#34;flag&#34; &#34;log&#34; &#34;os&#34; &#34;github.com/luraproject/lura/config&#34; &#34;github.com/luraproject/lura/logging&#34; &#34;github.com/luraproject/lura/proxy&#34; &#34;github.com/luraproject/lura/router/gin&#34; ) func main() { port := flag.Int(&#34;p&#34;, 0, &#34;Port of the service&#34;) logLevel := flag.String(&#34;l&#34;, &#34;ERROR&#34;, &#34;Logging level&#34;) debug := flag.Bool(&#34;d&#34;, false, &#34;Enable the debug&#34;) configFile := flag.String(&#34;c&#34;, &#34;/etc/lura/lura.json&#34;, &#34;Path to the configuration filename&#34;) flag.Parse() parser := config.NewParser() serviceConfig, err := parser.Parse(*configFile) if err != nil { log.Fatal(&#34;ERROR:&#34;, err.Error()) } serviceConfig.Debug = serviceConfig.Debug || *debug if *port !"><meta name=generator content="Hugo 0.85.0"><meta name=ROBOTS content="NOINDEX, NOFOLLOW"><link rel=stylesheet href=/ananke/css/main.min.css><meta property="og:title" content="API网关之krakend"><meta property="og:description" content="这一篇已经拖了好久了，以至于提笔开始写的时候，krakend项目已经改名为lura了，而且这个网关项目还进入到了CNCF中，真的是士别三日，当刮目相看了。不知不觉，我使用的这个开源项目作为团队的业务网关都已经上线了。
+当初我为什么要选择这个网关呢？首先团队跟外部沟通的协议为HTTP，有一些鉴权需求，本身业务量并不大，需要支持自定义插件的，最好是用golang写的，便于维护。从功能上来讲，其实nginx非常符合我的需求，除了技术栈，我只用了几天时间调研试用，就迅速确定了krakend作为API网关的框架，使用简单，性能还很强的样子。当然，从业务量上来讲，性能不是第一优先级，我需要解决的是从无到有的问题。
+我所在的团队属于初创，后端这部分有好几个人在写，功能上重复，每个人都跟自己的业务前端对接，部门所做的几个功能都挺分散的，再加上权限控制的需求愈发强烈，网关的必要性就凸显出来了。短短不到百行代码，就能创建一个API网关，这是我选择的主要原因。
+package main import ( &#34;flag&#34; &#34;log&#34; &#34;os&#34; &#34;github.com/luraproject/lura/config&#34; &#34;github.com/luraproject/lura/logging&#34; &#34;github.com/luraproject/lura/proxy&#34; &#34;github.com/luraproject/lura/router/gin&#34; ) func main() { port := flag.Int(&#34;p&#34;, 0, &#34;Port of the service&#34;) logLevel := flag.String(&#34;l&#34;, &#34;ERROR&#34;, &#34;Logging level&#34;) debug := flag.Bool(&#34;d&#34;, false, &#34;Enable the debug&#34;) configFile := flag.String(&#34;c&#34;, &#34;/etc/lura/lura.json&#34;, &#34;Path to the configuration filename&#34;) flag.Parse() parser := config.NewParser() serviceConfig, err := parser.Parse(*configFile) if err != nil { log.Fatal(&#34;ERROR:&#34;, err.Error()) } serviceConfig.Debug = serviceConfig.Debug || *debug if *port !"><meta property="og:type" content="article"><meta property="og:url" content="http://example.org/posts/api%E7%BD%91%E5%85%B3%E4%B9%8Bkrakend/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-07-12T00:08:09+08:00"><meta property="article:modified_time" content="2021-07-12T00:08:09+08:00"><meta itemprop=name content="API网关之krakend"><meta itemprop=description content="这一篇已经拖了好久了，以至于提笔开始写的时候，krakend项目已经改名为lura了，而且这个网关项目还进入到了CNCF中，真的是士别三日，当刮目相看了。不知不觉，我使用的这个开源项目作为团队的业务网关都已经上线了。
+当初我为什么要选择这个网关呢？首先团队跟外部沟通的协议为HTTP，有一些鉴权需求，本身业务量并不大，需要支持自定义插件的，最好是用golang写的，便于维护。从功能上来讲，其实nginx非常符合我的需求，除了技术栈，我只用了几天时间调研试用，就迅速确定了krakend作为API网关的框架，使用简单，性能还很强的样子。当然，从业务量上来讲，性能不是第一优先级，我需要解决的是从无到有的问题。
+我所在的团队属于初创，后端这部分有好几个人在写，功能上重复，每个人都跟自己的业务前端对接，部门所做的几个功能都挺分散的，再加上权限控制的需求愈发强烈，网关的必要性就凸显出来了。短短不到百行代码，就能创建一个API网关，这是我选择的主要原因。
+package main import ( &#34;flag&#34; &#34;log&#34; &#34;os&#34; &#34;github.com/luraproject/lura/config&#34; &#34;github.com/luraproject/lura/logging&#34; &#34;github.com/luraproject/lura/proxy&#34; &#34;github.com/luraproject/lura/router/gin&#34; ) func main() { port := flag.Int(&#34;p&#34;, 0, &#34;Port of the service&#34;) logLevel := flag.String(&#34;l&#34;, &#34;ERROR&#34;, &#34;Logging level&#34;) debug := flag.Bool(&#34;d&#34;, false, &#34;Enable the debug&#34;) configFile := flag.String(&#34;c&#34;, &#34;/etc/lura/lura.json&#34;, &#34;Path to the configuration filename&#34;) flag.Parse() parser := config.NewParser() serviceConfig, err := parser.Parse(*configFile) if err != nil { log.Fatal(&#34;ERROR:&#34;, err.Error()) } serviceConfig.Debug = serviceConfig.Debug || *debug if *port !"><meta itemprop=datePublished content="2021-07-12T00:08:09+08:00"><meta itemprop=dateModified content="2021-07-12T00:08:09+08:00"><meta itemprop=wordCount content="268"><meta itemprop=keywords content><meta name=twitter:card content="summary"><meta name=twitter:title content="API网关之krakend"><meta name=twitter:description content="这一篇已经拖了好久了，以至于提笔开始写的时候，krakend项目已经改名为lura了，而且这个网关项目还进入到了CNCF中，真的是士别三日，当刮目相看了。不知不觉，我使用的这个开源项目作为团队的业务网关都已经上线了。
+当初我为什么要选择这个网关呢？首先团队跟外部沟通的协议为HTTP，有一些鉴权需求，本身业务量并不大，需要支持自定义插件的，最好是用golang写的，便于维护。从功能上来讲，其实nginx非常符合我的需求，除了技术栈，我只用了几天时间调研试用，就迅速确定了krakend作为API网关的框架，使用简单，性能还很强的样子。当然，从业务量上来讲，性能不是第一优先级，我需要解决的是从无到有的问题。
+我所在的团队属于初创，后端这部分有好几个人在写，功能上重复，每个人都跟自己的业务前端对接，部门所做的几个功能都挺分散的，再加上权限控制的需求愈发强烈，网关的必要性就凸显出来了。短短不到百行代码，就能创建一个API网关，这是我选择的主要原因。
+package main import ( &#34;flag&#34; &#34;log&#34; &#34;os&#34; &#34;github.com/luraproject/lura/config&#34; &#34;github.com/luraproject/lura/logging&#34; &#34;github.com/luraproject/lura/proxy&#34; &#34;github.com/luraproject/lura/router/gin&#34; ) func main() { port := flag.Int(&#34;p&#34;, 0, &#34;Port of the service&#34;) logLevel := flag.String(&#34;l&#34;, &#34;ERROR&#34;, &#34;Logging level&#34;) debug := flag.Bool(&#34;d&#34;, false, &#34;Enable the debug&#34;) configFile := flag.String(&#34;c&#34;, &#34;/etc/lura/lura.json&#34;, &#34;Path to the configuration filename&#34;) flag.Parse() parser := config.NewParser() serviceConfig, err := parser.Parse(*configFile) if err != nil { log.Fatal(&#34;ERROR:&#34;, err.Error()) } serviceConfig.Debug = serviceConfig.Debug || *debug if *port !"></head><body class="ma0 avenir bg-near-white"><header><div class=bg-black><nav class="pv3 ph3 ph4-ns" role=navigation><div class="flex-l justify-between items-center center"><a href=/ class="f3 fw2 hover-white no-underline white-90 dib">just for fun!</a><div class="flex-l items-center"></div></div></nav></div></header><main class=pb7 role=main><article class="flex-l flex-wrap justify-between mw8 center ph3"><header class="mt4 w-100"><aside class="instapaper_ignoref b helvetica tracked">POSTS</aside><div id=sharing class=mt3><a href="https://www.facebook.com/sharer.php?u=http://example.org/posts/api%E7%BD%91%E5%85%B3%E4%B9%8Bkrakend/" class="facebook no-underline" aria-label="share on Facebook"><svg height="32" style="enable-background:new 0 0 67 67" viewBox="0 0 67 67" width="32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M28.765 50.32h6.744V33.998h4.499l.596-5.624h-5.095l.007-2.816c0-1.466.14-2.253 2.244-2.253h2.812V17.68h-4.5c-5.405.0-7.307 2.729-7.307 7.317v3.377h-3.369v5.625h3.369V50.32zM33 64C16.432 64 3 50.569 3 34S16.432 4 33 4s30 13.431 30 30S49.568 64 33 64z" style="fill-rule:evenodd;clip-rule:evenodd"/></svg></a><a href="https://twitter.com/share?url=http://example.org/posts/api%E7%BD%91%E5%85%B3%E4%B9%8Bkrakend/&text=API%e7%bd%91%e5%85%b3%e4%b9%8bkrakend" class="twitter no-underline" aria-label="share on Twitter"><svg height="32" style="enable-background:new 0 0 67 67" viewBox="0 0 67 67" width="32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M37.167 22.283c-2.619.953-4.274 3.411-4.086 6.101l.063 1.038-1.048-.127c-3.813-.487-7.145-2.139-9.974-4.915l-1.383-1.377-.356 1.017c-.754 2.267-.272 4.661 1.299 6.271.838.89.649 1.017-.796.487-.503-.169-.943-.296-.985-.233-.146.149.356 2.076.754 2.839.545 1.06 1.655 2.097 2.871 2.712l1.027.487-1.215.021c-1.173.0-1.215.021-1.089.467.419 1.377 2.074 2.839 3.918 3.475l1.299.444-1.131.678c-1.676.976-3.646 1.526-5.616 1.568C19.775 43.256 19 43.341 19 43.405c0 .211 2.557 1.397 4.044 1.864 4.463 1.377 9.765.783 13.746-1.568 2.829-1.673 5.657-5 6.978-8.221.713-1.716 1.425-4.851 1.425-6.354.0-.975.063-1.102 1.236-2.267.692-.678 1.341-1.419 1.467-1.631.21-.403.188-.403-.88-.043-1.781.636-2.033.551-1.152-.402.649-.678 1.425-1.907 1.425-2.267.0-.063-.314.042-.671.233-.377.212-1.215.53-1.844.72l-1.131.361-1.027-.7c-.566-.381-1.361-.805-1.781-.932C39.766 21.902 38.131 21.944 37.167 22.283zM33 64C16.432 64 3 50.569 3 34S16.432 4 33 4s30 13.431 30 30S49.568 64 33 64z" style="fill-rule:evenodd;clip-rule:evenodd;fill:"/></svg></a><a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.org/posts/api%E7%BD%91%E5%85%B3%E4%B9%8Bkrakend/&title=API%e7%bd%91%e5%85%b3%e4%b9%8bkrakend" class="linkedin no-underline" aria-label="share on LinkedIn"><svg height="32" style="enable-background:new 0 0 65 65" viewBox="0 0 65 65" width="32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M50.837 48.137V36.425c0-6.275-3.35-9.195-7.816-9.195-3.604.0-5.219 1.983-6.119 3.374V27.71h-6.79c.09 1.917.0 20.427.0 20.427h6.79V36.729c0-.609.044-1.219.224-1.655.49-1.22 1.607-2.483 3.482-2.483 2.458.0 3.44 1.873 3.44 4.618v10.929H50.837zM22.959 24.922c2.367.0 3.842-1.57 3.842-3.531-.044-2.003-1.475-3.528-3.797-3.528s-3.841 1.524-3.841 3.528c0 1.961 1.474 3.531 3.753 3.531H22.959zM34 64C17.432 64 4 50.568 4 34 4 17.431 17.432 4 34 4s30 13.431 30 30c0 16.568-13.432 30-30 30zM26.354 48.137V27.71h-6.789v20.427h6.789z" style="fill-rule:evenodd;clip-rule:evenodd;fill:"/></svg></a></div><h1 class="f1 athelas mt3 mb1">API网关之krakend</h1><time class="f6 mv4 dib tracked" datetime=2021-07-12T00:08:09+08:00>July 12, 2021</time></header><div class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>这一篇已经拖了好久了，以至于提笔开始写的时候，krakend项目已经改名为<a href=https://luraproject.org/>lura</a>了，而且这个网关项目还进入到了CNCF中，真的是士别三日，当刮目相看了。不知不觉，我使用的这个开源项目作为团队的业务网关都已经上线了。</p><p><img src=./lura-gateway.png alt=lura-gateway></p><p>当初我为什么要选择这个网关呢？首先团队跟外部沟通的协议为HTTP，有一些鉴权需求，本身业务量并不大，需要支持自定义插件的，最好是用golang写的，便于维护。从功能上来讲，其实nginx非常符合我的需求，除了技术栈，我只用了几天时间调研试用，就迅速确定了krakend作为API网关的框架，使用简单，<a href=https://www.krakend.io/docs/benchmarks/api-gateway-benchmark/>性能还很强</a>的样子。当然，从业务量上来讲，性能不是第一优先级，我需要解决的是从无到有的问题。</p><p>我所在的团队属于初创，后端这部分有好几个人在写，功能上重复，每个人都跟自己的业务前端对接，部门所做的几个功能都挺分散的，再加上权限控制的需求愈发强烈，网关的必要性就凸显出来了。短短不到百行代码，就能创建一个API网关，这是我选择的主要原因。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+
+    <span style=color:#f92672>import</span> (
+        <span style=color:#e6db74>&#34;flag&#34;</span>
+        <span style=color:#e6db74>&#34;log&#34;</span>
+        <span style=color:#e6db74>&#34;os&#34;</span>
+
+        <span style=color:#e6db74>&#34;github.com/luraproject/lura/config&#34;</span>
+        <span style=color:#e6db74>&#34;github.com/luraproject/lura/logging&#34;</span>
+        <span style=color:#e6db74>&#34;github.com/luraproject/lura/proxy&#34;</span>
+        <span style=color:#e6db74>&#34;github.com/luraproject/lura/router/gin&#34;</span>
+    )
+
+    <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+        <span style=color:#a6e22e>port</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>Int</span>(<span style=color:#e6db74>&#34;p&#34;</span>, <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Port of the service&#34;</span>)
+        <span style=color:#a6e22e>logLevel</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>String</span>(<span style=color:#e6db74>&#34;l&#34;</span>, <span style=color:#e6db74>&#34;ERROR&#34;</span>, <span style=color:#e6db74>&#34;Logging level&#34;</span>)
+        <span style=color:#a6e22e>debug</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>Bool</span>(<span style=color:#e6db74>&#34;d&#34;</span>, <span style=color:#66d9ef>false</span>, <span style=color:#e6db74>&#34;Enable the debug&#34;</span>)
+        <span style=color:#a6e22e>configFile</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>String</span>(<span style=color:#e6db74>&#34;c&#34;</span>, <span style=color:#e6db74>&#34;/etc/lura/lura.json&#34;</span>, <span style=color:#e6db74>&#34;Path to the configuration filename&#34;</span>)
+        <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>Parse</span>()
+
+        <span style=color:#a6e22e>parser</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>NewParser</span>()
+        <span style=color:#a6e22e>serviceConfig</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>parser</span>.<span style=color:#a6e22e>Parse</span>(<span style=color:#f92672>*</span><span style=color:#a6e22e>configFile</span>)
+        <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+            <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#e6db74>&#34;ERROR:&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+        }
+        <span style=color:#a6e22e>serviceConfig</span>.<span style=color:#a6e22e>Debug</span> = <span style=color:#a6e22e>serviceConfig</span>.<span style=color:#a6e22e>Debug</span> <span style=color:#f92672>||</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>debug</span>
+        <span style=color:#66d9ef>if</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>port</span> <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span> {
+            <span style=color:#a6e22e>serviceConfig</span>.<span style=color:#a6e22e>Port</span> = <span style=color:#f92672>*</span><span style=color:#a6e22e>port</span>
+        }
+
+        <span style=color:#a6e22e>logger</span>, <span style=color:#a6e22e>_</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>logging</span>.<span style=color:#a6e22e>NewLogger</span>(<span style=color:#f92672>*</span><span style=color:#a6e22e>logLevel</span>, <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Stdout</span>, <span style=color:#e6db74>&#34;[LURA]&#34;</span>)
+
+        <span style=color:#a6e22e>routerFactory</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>gin</span>.<span style=color:#a6e22e>DefaultFactory</span>(<span style=color:#a6e22e>proxy</span>.<span style=color:#a6e22e>DefaultFactory</span>(<span style=color:#a6e22e>logger</span>), <span style=color:#a6e22e>logger</span>)
+
+        <span style=color:#a6e22e>routerFactory</span>.<span style=color:#a6e22e>New</span>().<span style=color:#a6e22e>Run</span>(<span style=color:#a6e22e>serviceConfig</span>)
+    }
+</code></pre></div><p>不过，看似简洁的背后，其实是一把双刃剑，很快我就遇到了几个问题。</p><h2 id=krakend不支持websocket代理>krakend不支持websocket代理</h2><p>这个其实也不能叫做问题，因为我使用的是开源社区版本，企业版是支持的，我在<a href=https://github.com/devopsfaith/krakend-ce/issues/84#issuecomment-666330448>issues</a>中看到了关于这个问题的回答，老实说，有点心酸：</p><blockquote><p>We are developing and maintaining the project and giving support for free. You can extend and customize it all you want, for free. Do you want us to move to other (payed) projects and let KrakenD die? I&rsquo;m sure you&rsquo;ll understand that engineers (good or bad) are people and we need to eat and pay bills too</p></blockquote><h2 id=krakend配置文件不支持正则表达式>krakend配置文件不支持正则表达式</h2><p>如果你想使用正则代理接口如<code>^/ping/.*/pong$</code>，抱歉，不支持，你只能按以下格式写</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{
+  <span style=color:#f92672>&#34;endpoint&#34;</span>: <span style=color:#e6db74>&#34;/myserviceA/{level1}/{level2}/{level3}&#34;</span>,
+  <span style=color:#f92672>&#34;backend&#34;</span>: [
+    {
+      <span style=color:#f92672>&#34;host&#34;</span>: [ <span style=color:#e6db74>&#34;http://serverA/&#34;</span> ],
+      <span style=color:#f92672>&#34;url_pattern&#34;</span>: <span style=color:#e6db74>&#34;/{level1}/{level2}/{level3}&#34;</span>
+    }
+  ]
+}<span style=color:#960050;background-color:#1e0010>,</span>
+{
+  <span style=color:#f92672>&#34;endpoint&#34;</span>: <span style=color:#e6db74>&#34;/myserviceB/{level1}/{level2}/{level3}&#34;</span>,
+  <span style=color:#f92672>&#34;backend&#34;</span>: [
+    {
+      <span style=color:#f92672>&#34;host&#34;</span>: [ <span style=color:#e6db74>&#34;http://localhost:8060&#34;</span> ],
+      <span style=color:#f92672>&#34;url_pattern&#34;</span>: <span style=color:#e6db74>&#34;/{level1}/{level2}/{level3}&#34;</span>
+    }
+  ]
+}
+</code></pre></div><p>这样写你才能匹配地到<code>/myserviceA/a/b/c</code>，虽然有点难看，但勉强也能接受，只要多码点字而已，具体讨论请查看此处<a href=https://github.com/devopsfaith/krakend-ce/issues/30#issuecomment-413629959>issues</a></p><h2 id=krakend不支持同时配置多个method>krakend不支持同时配置多个Method</h2><p>这个意思就是如果<code>/myserviceA/{level1}/{level2}/{level3}</code>这个URI有<code>POST</code>、<code>PUT</code>、<code>GET</code>三个方法，你得分别配置三次</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{
+  <span style=color:#f92672>&#34;endpoint&#34;</span>: <span style=color:#e6db74>&#34;/myserviceA/{level1}/{level2}/{level3}&#34;</span>,
+  <span style=color:#f92672>&#34;method&#34;</span>: <span style=color:#e6db74>&#34;POST&#34;</span>,
+  <span style=color:#f92672>&#34;backend&#34;</span>: [
+    {
+      <span style=color:#f92672>&#34;host&#34;</span>: [ <span style=color:#e6db74>&#34;http://serverA/&#34;</span> ],
+      <span style=color:#f92672>&#34;url_pattern&#34;</span>: <span style=color:#e6db74>&#34;/{level1}/{level2}/{level3}&#34;</span>
+    }
+  ]
+}<span style=color:#960050;background-color:#1e0010>,</span>
+{
+  <span style=color:#f92672>&#34;endpoint&#34;</span>: <span style=color:#e6db74>&#34;/myserviceA/{level1}/{level2}/{level3}&#34;</span>,
+  <span style=color:#f92672>&#34;method&#34;</span>: <span style=color:#e6db74>&#34;PUT&#34;</span>, 
+  <span style=color:#f92672>&#34;backend&#34;</span>: [
+    {
+      <span style=color:#f92672>&#34;host&#34;</span>: [ <span style=color:#e6db74>&#34;http://serverA/&#34;</span> ],
+      <span style=color:#f92672>&#34;url_pattern&#34;</span>: <span style=color:#e6db74>&#34;/{level1}/{level2}/{level3}&#34;</span>
+    }
+  ]
+}<span style=color:#960050;background-color:#1e0010>,</span>
+{
+  <span style=color:#f92672>&#34;endpoint&#34;</span>: <span style=color:#e6db74>&#34;/myserviceA/{level1}/{level2}/{level3}&#34;</span>,
+  <span style=color:#f92672>&#34;method&#34;</span>: <span style=color:#e6db74>&#34;GET&#34;</span>, 
+  <span style=color:#f92672>&#34;backend&#34;</span>: [
+    {
+      <span style=color:#f92672>&#34;host&#34;</span>: [ <span style=color:#e6db74>&#34;http://serverA/&#34;</span> ],
+      <span style=color:#f92672>&#34;url_pattern&#34;</span>: <span style=color:#e6db74>&#34;/{level1}/{level2}/{level3}&#34;</span>
+    }
+  ]
+}<span style=color:#960050;background-color:#1e0010>,</span>
+</code></pre></div><p>是不是感觉心态要爆炸，这得写的多繁琐啊。</p><h2 id=krakend配置文件模板难用>krakend配置文件模板难用</h2><p>如以上示例所见，krakend的配置管理是个大难题，通常我们需要一个模板来简化配置，无奈官方提供的模板功能太弱且难用，我在公司用<a href=https://github.com/ctripcorp/apollo>apollo</a>作为配置中心，
+key为<code>config</code>，value就是krakend的json配置文件，因为配置较多，超过了value的长度限制，不得已，只能拆，根据host拆成不同的文件，然后用patch的方式再将json文件合并成一个，也不是不能用，至少比官方模板要好一点点吧，不过核心问题还是配置文件不能简化，这真的是很伤脑筋啊。</p><h2 id=http响应配置>HTTP响应配置</h2><p>一开始想当然地觉着使用krakend代理的http请求响应是透传的，但偏偏不是这样的，默认情况是只要是返回的http code大于400，krakend返回的就是500，要想做到透传，需要增加两次<code>no-op</code>配置，如下所示：</p><pre><code>{
+    &quot;endpoint&quot;: &quot;/auth/login&quot;,
+    &quot;output_encoding&quot;: &quot;no-op&quot;,
+    &quot;backend&quot;: [
+        {
+            &quot;encoding&quot;: &quot;no-op&quot;,
+            &quot;host&quot;: [ &quot;localhost:8080&quot; ],
+            &quot;url_pattern&quot;: &quot;/__debug/login&quot;
+        }
+    ]
+}
+</code></pre><p><a href=https://www.krakend.io/docs/endpoints/no-op/>点此查看文档</a>
+正如你所看到的那样，配置文件在不知不觉中越变越长……</p><hr><p>说了那么多槽点，总得说点优点吧，毕竟我也是给这个项目做出过贡献的人，优点我总结了两点</p><ol><li>简单，这个在开篇也说了</li><li>无状态，不需要数据库，貌似还不支持动态更新配置</li></ol><p>客观来说，因为简单，所以接入门槛自然很低，熟悉gin框架的情况下，自定义插件也非常容易，适合轻量型网关场景，确实解决了团队网关从无到有这个问题，根据使用情况来看，目前最大的问题在于配置文件过于冗长，这个是先天劣势，不好弥补；再就是不支持websocket。但是瑕不掩瑜，krakend自有其适用的场景和其存在的价值。哦，不过呢，随着团队业务的发展，后期大概率是要换掉krakend了。</p><ul class=pa0></ul><div class="mt6 instapaper_ignoref"></div></div><aside class="w-30-l mt6-l"></aside></article></main><footer class="bg-black bottom-0 w-100 pa3" role=contentinfo><div class="flex justify-between"><a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href=http://example.org/>&copy; just for fun! 2021</a><div></div></div></footer></body></html>
