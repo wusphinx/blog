@@ -1,0 +1,92 @@
+---
+# Documentation: https://wowchemy.com/docs/managing-content/
+
+title: "golang调度器的一个陷阱"
+subtitle: ""
+summary: ""
+authors: []
+tags: []
+categories: 
+- 翻译
+date: 2021-02-07T15:47:25+08:00
+lastmod: 2021-02-07T15:47:25+08:00
+featured: false
+draft: false
+
+# Featured image
+# To use, add an image named `featured.jpg/png` to your page's folder.
+# Focal points: Smart, Center, TopLeft, Top, TopRight, Left, Right, BottomLeft, Bottom, BottomRight.
+image:
+  caption: ""
+  focal_point: ""
+  preview_only: false
+
+# Projects (optional).
+#   Associate this post with one or more of your projects.
+#   Simply enter your project's folder or file name without extension.
+#   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
+#   Otherwise, set `projects = []`.
+projects: []
+---
+让我们快速进入问题，不浪费时间。试着执行下面的golang代码片段。
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"time"
+)
+
+func main() {
+	var x int
+	threads := runtime.GOMAXPROCS(0)
+	println(threads)
+	for i := 0; i < threads; i++ {
+		go func() {
+			for {
+				x++
+			}
+		}()
+	}
+	time.Sleep(time.Second)
+	fmt.Println("x =", x)
+}
+```
+运行代码
+```
+$ GOMAXPROCS=8 go run x.go
+```
+(旁注：熟悉Golang的同道想必知道`GOMAXPROCS`其实对应的CPU核心数，也就是线程数，这里应该是原作者运行示例时的计算机的CPU核数为8，因为根据文档定义，如果`runtime.GOMAXPROCS(0)`传入参数小于1，如果特殊指定，GOMAXPROCS就等于CPU核心数)
+
+你观察到程序从未终止吗？这就是我说的golang陷阱。如果你用C/C++写同样的程序，你就不会发现这样的问题。现在让我们修改程序，修改以下一行： 
+```
+threads := runtime.GOMAXPROCS(0)-1
+```
+所以，我们只是减少了1个go协程的数量。如果你在这个改变后重新运行程序，你会发现程序正确地终止，并打印出结果。这非常令人惊讶，不是吗？要了解这个问题背后的原因，我们需要了解一下golang运行时和调度器的实现。
+
+### 揭开调度器的神秘面纱
+Golang提供了用于并发的goroutine。它们类似于线程，但它们是轻量级的，开销非常小。拥有数万个goroutine的程序并不罕见，而拥有一万个pthreads代价就非常高了。golang在用户态中实现了goroutine。golang运行时为go程序创建的操作系统线程（pthreads）等于GOMAXPROCS的数量。Go协程被golang运行时安排在这些有限的OS线程上。
+
+## 操作系统调度器
+让我们回顾一下操作系统是如何调度进程的。通常情况下，操作系统调度器会保存一份操作系统进程的列表，它们处于正在运行、可运行或不可运行的状态。如果一个进程的运行时间超过了调度器的时间片，它就会抢占该进程，并安排在同一CPU上执行另一个可运行的进程。抢占是通过定时器中断来实现的。定时器中断的频率为调度器时间片的间隔。在一段代码中正在执行的进程会停止执行，保存进程执行上下文并执行中断处理程序。中断处理程序会将执行切换到调度器中。现在，调度器可以决定在这个CPU上执行哪个可运行的进程。调度器会选择一个进程并切换到它的执行上下文。
+
+### Golang的调度器
+Golang实现了一个可协作的抢占式调度器。它没有实现基于定时器中断的抢占。但是，这个调度器应该方便在一个OS线程上同时运行多个goroutine。Golang在运行时提供的构造体、库和系统调用(？此处翻译的不好，构造体这个说法听着怪怪的)中加入钩子，可以与调度器进行协作。由于它避开了调用进入调度器的计时器，所以将运行时提供的函数作为进入调度器的入口。如果我们设法写一个不使用任何运行时提供的封装函数的goroutine，会发生什么？这正是这里发生的事情。那个goroutine不会调用到调度器，并导致goroutine的抢占。
+
+在上面的程序中，我们执行的goroutine等于GOMAXPROCS（操作系统线程）。主协程是一个额外的goroutine。每个go协程都运行一个无限循环，并带有一个整数增量操作，这为协程提供了没有调用到调度器的范围。因此，所有六个线程（GOMAXPROCS）都在运行无限循环，它们永远不会抢占。处于可运行状态的主协程无法执行，因为这六个线程中的任何一个线程都忙于执行无限循环，所以调度器永远不会被执行。当我们减少1个线程时，现在有一个OS线程变得空闲，能够执行主程序。
+
+(旁注：假设系统是8个CPU，我们GOMAXPROCS减1以后运行程序，就会有一个核是空闲的，此时正好可以进入主线程中执行，虽然原作者这里写的是6，不过我觉得处于无限循环的线程应该等同于threads，当threads等于系统CPU核心数时，由于无限循环，主协程没有机会被调度到，所以就程序没法退出，当将threads头1时，主协程才有机会能够执行，GOMAXPROCS限制的是goroutine的最大并发能力，这个也是由golang自己的调度器实现的，那主协程能运行是由于golang调度所致吗？此处先埋下伏笔。
+我分别在不同的go版本下运行了示例程序：1.13、1.14，得到了不同的结果，1.13符合预期，但是1.14下程序却有不同表现，主线程总能得到执行，我想这应该是因为1.14版本的go调度器有较大变化所致，此处先埋点，后开坑)
+
+在现实世界的程序中，这种情况是不太可能发生的，因为我们可能会使用运行时提供的功能，如`channels`、`systemcalls`、`fmt.Sprint`、`Mutex`、`time.Sleep`至少一次。你可以在无限循环中添加一个无害的`time.Sleep(0)`，然后观察程序不再挂起。
+
+## 结论
+虽然出现这个问题的几率非常小，但还是有可能发生。解决这个问题的方法是在这种情况下，从程序中强行调用进入调度器。`runtime.Gosched()`的调用有利于强制进入调度器。
+
+这篇博文的灵感来自于我的同事，他在玩golang的时候就遇到了这个问题。
+
+(旁注：此文非常有意思，一个简单的示例，却可以发散读者对于调度器的理解，有你当然，这篇文章还没有讲解goroutine为什么轻量，这是另一个有意思的话题，欢迎一起讨论)
+
+---
+原文链接 [pitfall-of-golang-scheduler](http://www.sarathlakshman.com/2016/06/15/pitfall-of-golang-scheduler)
