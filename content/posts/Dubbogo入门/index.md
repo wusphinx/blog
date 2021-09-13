@@ -1,7 +1,7 @@
 ---
 title: "Dubbogo入门"
 date: 2021-09-13T22:04:41+08:00
-draft: true
+draft: false 
 ---
 鉴于我司java技术栈为主这个事实，go作为小众，为了使用公司的[dubbo](https://dubbo.apache.org/zh/)基础设施，只有三条路可以走：
 1. 让dubbo应用开发者提供http协议接口(你确定别人愿意花额外的时间干这件事？)，此路不通；
